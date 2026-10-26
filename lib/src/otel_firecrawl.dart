@@ -1,15 +1,16 @@
-// Licensed under the Dartastic Pro Software License Agreement.
+// Licensed under the Apache License, Version 2.0
 // Copyright 2025-2026 Mindful Software LLC d/b/a Dartastic.io, All rights reserved.
 
-import 'package:dartastic_opentelemetry/dartastic_opentelemetry.dart';
+import 'package:dartastic_opentelemetry_api/dartastic_opentelemetry_api.dart';
 
 import 'otel_firecrawl_suppression.dart';
 
 const _tracerName = 'dartastic_otel_libs_firecrawl';
 
-Tracer _tracer() => OTel.tracerProvider().getTracer(_tracerName);
+APITracer _tracer() => OTelAPI.tracerProvider().getTracer(_tracerName);
 
 class FirecrawlResult {
+  /// Creates a result.
   const FirecrawlResult({
     this.url,
     this.jobId,
@@ -82,8 +83,13 @@ class FirecrawlResult {
   final int? statusCode;
 }
 
+/// What a traced call returned: the value for the caller plus fields
+/// recorded on the span.
 class FirecrawlCallResult<T> {
+  /// Creates a call result.
   const FirecrawlCallResult({required this.value, this.result});
+
+  /// The value returned to the caller.
   final T value;
   final FirecrawlResult? result;
 }
@@ -109,7 +115,7 @@ Future<T> tracedFirecrawl<T>({
   final span = _tracer().startSpan(
     'firecrawl $operation',
     kind: SpanKind.client,
-    attributes: OTel.attributesFromMap(m),
+    attributes: OTelAPI.attributesFromMap(m),
   );
   try {
     final r = await invoke();
@@ -117,79 +123,79 @@ Future<T> tracedFirecrawl<T>({
       final res = r.result!;
       final extras = <Attribute<Object>>[];
       if (res.url != null) {
-        extras.add(OTel.attributeString('firecrawl.url', res.url!));
+        extras.add(OTelAPI.attributeString('firecrawl.url', res.url!));
       }
       if (res.jobId != null) {
-        extras.add(OTel.attributeString('firecrawl.job.id', res.jobId!));
+        extras.add(OTelAPI.attributeString('firecrawl.job.id', res.jobId!));
       }
       if (res.formats != null) {
-        extras.add(OTel.attributeStringList(
+        extras.add(OTelAPI.attributeStringList(
           'firecrawl.formats',
           res.formats!,
         ));
       }
       if (res.onlyMainContent != null) {
-        extras.add(OTel.attributeBool(
+        extras.add(OTelAPI.attributeBool(
           'firecrawl.only_main_content',
           res.onlyMainContent!,
         ));
       }
       if (res.waitForMs != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'firecrawl.wait_for_ms',
           res.waitForMs!,
         ));
       }
       if (res.actions != null) {
-        extras.add(OTel.attributeStringList(
+        extras.add(OTelAPI.attributeStringList(
           'firecrawl.actions',
           res.actions!,
         ));
       }
       if (res.actionCount != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'firecrawl.action.count',
           res.actionCount!,
         ));
       }
       if (res.screenshot != null) {
-        extras.add(OTel.attributeBool(
+        extras.add(OTelAPI.attributeBool(
           'firecrawl.screenshot',
           res.screenshot!,
         ));
       }
       if (res.markdownLength != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'firecrawl.markdown.length',
           res.markdownLength!,
         ));
       }
       if (res.htmlLength != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'firecrawl.html.length',
           res.htmlLength!,
         ));
       }
       if (res.linkCount != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'firecrawl.link.count',
           res.linkCount!,
         ));
       }
       if (res.crawlPageLimit != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'firecrawl.crawl.page_limit',
           res.crawlPageLimit!,
         ));
       }
       if (res.crawlPagesCrawled != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'firecrawl.crawl.pages_crawled',
           res.crawlPagesCrawled!,
         ));
       }
       if (res.crawlStatus != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'firecrawl.crawl.status',
           res.crawlStatus!,
         ));
@@ -198,44 +204,44 @@ Future<T> tracedFirecrawl<T>({
         }
       }
       if (res.creditsUsed != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'firecrawl.credits.used',
           res.creditsUsed!,
         ));
       }
       if (res.extractSchemaProvided != null) {
-        extras.add(OTel.attributeBool(
+        extras.add(OTelAPI.attributeBool(
           'firecrawl.extract.schema_provided',
           res.extractSchemaProvided!,
         ));
       }
       if (res.searchQuery != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'firecrawl.search.query',
           res.searchQuery!,
         ));
       }
       if (res.searchResultCount != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'firecrawl.search.result_count',
           res.searchResultCount!,
         ));
       }
       if (res.errorCode != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'firecrawl.error.code',
           res.errorCode!,
         ));
         span.setStatus(SpanStatusCode.Error, 'Firecrawl ${res.errorCode}');
       }
       if (res.errorMessage != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'firecrawl.error.message',
           res.errorMessage!,
         ));
       }
       if (res.statusCode != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'http.response.status_code',
           res.statusCode!,
         ));
@@ -246,13 +252,13 @@ Future<T> tracedFirecrawl<T>({
           );
         }
       }
-      if (extras.isNotEmpty) span.addAttributes(OTel.attributes(extras));
+      if (extras.isNotEmpty) span.addAttributes(OTelAPI.attributes(extras));
     }
     return r.value;
   } catch (e, st) {
-    span.addAttributes(OTel.attributes([
-      OTel.attributeString(
-        ErrorResource.errorType.key,
+    span.addAttributes(OTelAPI.attributes([
+      OTelAPI.attributeString(
+        ErrorAttributes.errorType.key,
         e.runtimeType.toString(),
       ),
     ]));
